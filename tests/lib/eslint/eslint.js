@@ -37,10 +37,6 @@ const espree = require("espree");
 const { WarningService } = require("../../../lib/services/warning-service");
 
 //------------------------------------------------------------------------------
-// Constants
-//------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
@@ -1850,10 +1846,28 @@ describe("ESLint", () => {
 					});
 				});
 
-				it("should fail to load a TS config file if an outdated version of jiti is installed", async () => {
+				it("should fail to load a TS config file if an outdated version of jiti is installed (1.x)", async () => {
 					sinon
 						.stub(ConfigLoader, "loadJiti")
-						.resolves({ createJiti: void 0, version: "1.21.7" });
+						.resolves({ createJiti() {}, version: "1.21.7" });
+
+					const cwd = getFixturePath("ts-config-files", "ts");
+
+					eslint = new ESLint({
+						cwd,
+						flags,
+					});
+
+					await assert.rejects(eslint.lintText("foo();"), {
+						message:
+							"You are using an outdated version of the 'jiti' library. Please update to the latest version of 'jiti' to ensure compatibility and access to the latest features.",
+					});
+				});
+
+				it("should fail to load a TS config file if an outdated version of jiti is installed (2.1)", async () => {
+					sinon
+						.stub(ConfigLoader, "loadJiti")
+						.resolves({ createJiti() {}, version: "2.1.2" });
 
 					const cwd = getFixturePath("ts-config-files", "ts");
 
@@ -8019,10 +8033,10 @@ describe("ESLint", () => {
 					});
 				});
 
-				it("should fail to load a TS config file if an outdated version of jiti is installed", async () => {
+				it("should fail to load a TS config file if an outdated version of jiti is installed (1.x)", async () => {
 					sinon
 						.stub(ConfigLoader, "loadJiti")
-						.resolves({ createJiti: void 0, version: "1.21.7" });
+						.resolves({ createJiti() {}, version: "1.21.7" });
 
 					const cwd = getFixturePath("ts-config-files", "ts");
 
@@ -8031,7 +8045,25 @@ describe("ESLint", () => {
 						flags,
 					});
 
-					await assert.rejects(eslint.lintFiles("foo.js"), {
+					await assert.rejects(eslint.lintText("foo();"), {
+						message:
+							"You are using an outdated version of the 'jiti' library. Please update to the latest version of 'jiti' to ensure compatibility and access to the latest features.",
+					});
+				});
+
+				it("should fail to load a TS config file if an outdated version of jiti is installed (2.1)", async () => {
+					sinon
+						.stub(ConfigLoader, "loadJiti")
+						.resolves({ createJiti() {}, version: "2.1.2" });
+
+					const cwd = getFixturePath("ts-config-files", "ts");
+
+					eslint = new ESLint({
+						cwd,
+						flags,
+					});
+
+					await assert.rejects(eslint.lintText("foo();"), {
 						message:
 							"You are using an outdated version of the 'jiti' library. Please update to the latest version of 'jiti' to ensure compatibility and access to the latest features.",
 					});
